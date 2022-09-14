@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\Book;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ use Illuminate\Routing\Route;
  * 本の一覧表示(books.blade.php)
  */
 Route::get('/', function () {
-    return view('welcome');
+    return view('books');
 });
 
 /**
@@ -35,3 +36,7 @@ Route::post('/books', function (Request $request) {
 Route::delete('/book/{book}', function (Book $book) {
     // 
 });
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
