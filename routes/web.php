@@ -1,9 +1,14 @@
 <?php
 
 use App\Models\Book;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+// use Illuminate\Support\Facades\Validator;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +32,16 @@ Route::get('/', function () {
  * 本を追加
  */
 Route::post('/books', function (Request $request) {
-    // 
+
+    //バリデーション
+    $validator = Validator::make($request->all(), ['item_name' => 'required|max:255',]);
+
+    //バリデーション:エラー
+    if($validator->fails()) {
+        return redirect('/')
+        ->withInput()
+        ->withErrors($validator);
+    }
 });
 
 /**
