@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class BooksController extends Controller
 {
     /**
@@ -15,7 +16,8 @@ class BooksController extends Controller
      */
     public function index()
     {
-        $books = Book::orderBy('created_at', 'asc')->paginate(3);
+        $books = Book::where('user_id', Auth::user()->id)
+        ->orderBy('created_at', 'asc')->paginate(3);
         return view('/books', compact('books'));
     }
 
@@ -52,10 +54,20 @@ class BooksController extends Controller
                 ->withErrors($validator);
         }
 
+        $file = $request->file('item_img');
+        if(!empty($file)) {
+            $filename = $file->getClientOriginalName();
+            $file->move('./upload/', $filename);
+        } else {
+            $filename = "";
+        }
+
         $books = new Book;
+        $books->user_id = Auth::user()->id;
         $books->item_name = $request->item_name;
         $books->item_number = $request->item_number;
         $books->item_amount = $request->item_amount;
+        $books->item_img = $filename;
         $books->published = $request->published;
         $books->save();
         return redirect('/')->with('message', '本登録が完了しました。');
@@ -95,7 +107,7 @@ class BooksController extends Controller
         }
 
         //データ更新
-        $books = Book::find($request->id);
+        $books = Book::where('user_id', Auth::user()->id)->find($request->id);
         $books->item_name = $request->item_name;
         $books->item_number = $request->item_number;
         $books->item_amount = $request->item_amount;
@@ -109,8 +121,9 @@ class BooksController extends Controller
     /**
      * 更新画面
      */
-    public function edit(Book $books)
+    public function edit($book_id)
     {
+        $books = Book::where('user_id', Auth::user()->id)->find($book_id);
         return view('booksedit', ['book' => $books]);
     }
 
@@ -121,5 +134,10 @@ class BooksController extends Controller
     {
         $book->delete();
         return redirect('/');
+    }
+
+    public function __construct()
+    {
+        $this->middleware('auth');
     }
 }

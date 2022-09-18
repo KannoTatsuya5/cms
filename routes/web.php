@@ -19,6 +19,12 @@ use App\Http\Controllers\BooksController;
 |
 */
 
+Route::group(['middleware' => 'auth'], function() {
+    Route::get("/", function() {
+        return view("welcome");
+    });
+});
+
 /**
  * 本の一覧表示(books.blade.php)
  */
@@ -47,4 +53,4 @@ Route::delete('/book/{book}', [BooksController::class, 'delete']);
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\BooksController::class, 'index'])->name('home');
